@@ -16,9 +16,9 @@ Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "fluent-plugin-sampling-filter"
   gem.homepage = "http://github.com/tagomoris/fluent-plugin-sampling-filter"
-  gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  # gem.license = "MIT"
+  gem.summary = %Q{fluentd plugin to pickup sample data from matched massages}
+  gem.description = %Q{fluentd plugin to pickup sample data from matched massages}
   gem.email = "tagomoris@gmail.com"
   gem.authors = ["TAGOMORI Satoshi"]
   # dependencies defined in Gemfile
