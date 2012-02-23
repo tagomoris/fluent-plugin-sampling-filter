@@ -1,19 +1,50 @@
 = fluent-plugin-sampling-filter
 
-Description goes here.
+== Component
 
-== Contributing to fluent-plugin-sampling-filter
- 
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
-* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
-* Fork the project
-* Start a feature/bugfix branch
-* Commit and push until you are happy with your contribution
-* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
-* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+=== SamplingFilterOutput
+
+Do sampling from matching messages to analyse and report messages behavior, and emit sampled messages with modified tag.
+
+- sampling rate per tags, or for all
+- remove_prefix of tags for input messages, and add_prefix of tags for output(sampled) messages
+
+== Configuration
+
+=== SamplingFilterOutput
+
+Pickup 1/10 messages about each tags(default: 'sample_unit tag'), and add tag prefix 'sampled'.
+
+    <match **>
+      type sampling_filter
+      interval 10
+      add_prefix sampled
+    </match>
+    
+    <match sampled.**>
+      # output configurations where to send sampled messages
+    </match>
+
+Pickup 1/100 messages of all matched messages, and modify tags from input.** to output.**
+
+    <match input.**>
+      type sampling_filter
+      interval 100
+      sample_unit all
+      remove_prefix input
+      add_prefix output
+    </match>
+    
+    <match sampled.**>
+      # output configurations where to send sampled messages
+    </match>
+
+== TODO
+
+- consider what to do next
+- patches welcome!
 
 == Copyright
 
-Copyright (c) 2012 TAGOMORI Satoshi. See LICENSE.txt for
-further details.
-
+Copyright:: Copyright (c) 2012- TAGOMORI Satoshi (tagomoris)
+License::   Apache License, Version 2.0
