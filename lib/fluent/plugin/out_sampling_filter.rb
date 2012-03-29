@@ -52,13 +52,12 @@ class Fluent::SamplingFilterOutput < Fluent::Output
     # Code below is not thread safe, but @counts (counter for sampling rate) is not
     # so serious value (and probably will not be broke...),
     # then i let here as it is now.
-    @counts[t] ||= 0
     pairs = []
     es.each {|time,record|
-      c = @counts.fetch(t, 0) + 1
+      c = (@counts[t] = @counts.fetch(t, 0) + 1)
       if c % @interval == 0 
         pairs.push [time, record]
-        # reset only just before @counts[t] reaches Bignum...
+        # reset only just before @counts[t] is to be bignum from fixnum
         @counts[t] = 0 if c > 0x6fffffff
       end
     }
