@@ -49,15 +49,17 @@ class Fluent::SamplingFilterOutput < Fluent::Output
           tag
         end
     # Access to @counts SHOULD be protected by mutex, with a heavy penalty.
-    # @counts (counter for sampling rate) is not so serious value (and probably will not be broke...),
+    # Code below is not thread safe, but @counts (counter for sampling rate) is not
+    # so serious value (and probably will not be broke...),
     # then i let here as it is now.
     @counts[t] ||= 0
     pairs = []
     es.each {|time,record|
-      @counts[t] += 1
-      if @counts[t] == @interval
+      c = @counts.fetch(t, 0) + 1
+      if c % @interval == 0 
         pairs.push [time, record]
-        @counts[t] = 0
+        # reset only just before @counts[t] reaches Bignum...
+        @counts[t] = 0 if c > 0x6fffffff
       end
     }
     emit_sampled(tag, pairs)
