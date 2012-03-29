@@ -48,6 +48,9 @@ class Fluent::SamplingFilterOutput < Fluent::Output
         else
           tag
         end
+    # Access to @counts SHOULD be protected by mutex, with a heavy penalty.
+    # @counts (counter for sampling rate) is not so serious value (and probably will not be broke...),
+    # then i let here as it is now.
     @counts[t] ||= 0
     pairs = []
     es.each {|time,record|
