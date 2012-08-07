@@ -5,6 +5,7 @@ class Fluent::SamplingFilterOutput < Fluent::Output
   config_param :sample_unit, :string, :default => 'tag'
   config_param :remove_prefix, :string, :default => nil
   config_param :add_prefix, :string, :default => 'sampled'
+  config_param :minimum_rate_per_min, :integer, :default => nil
 
   def configure(conf)
     super
@@ -24,6 +25,7 @@ class Fluent::SamplingFilterOutput < Fluent::Output
                      raise Fluent::ConfigError, "sample_unit allows only 'tag' or 'all'"
                    end
     @counts = {}
+    @resets = {} if @minimum_rate_per_min
   end
 
   def emit_sampled(tag, time_record_pairs)
@@ -48,19 +50,38 @@ class Fluent::SamplingFilterOutput < Fluent::Output
         else
           tag
         end
+
+    pairs = []
+
     # Access to @counts SHOULD be protected by mutex, with a heavy penalty.
     # Code below is not thread safe, but @counts (counter for sampling rate) is not
     # so serious value (and probably will not be broken...),
     # then i let here as it is now.
-    pairs = []
-    es.each {|time,record|
-      c = (@counts[t] = @counts.fetch(t, 0) + 1)
-      if c % @interval == 0 
-        pairs.push [time, record]
-        # reset only just before @counts[t] is to be bignum from fixnum
-        @counts[t] = 0 if c > 0x6fffffff
+    if @minimum_rate_per_min
+      unless @resets[t]
+        @resets[t] = Fluent::Engine.now + (60 - rand(30))
       end
-    }
+      if Fluent::Engine.now > @resets[t]
+        @resets[t] = Fluent::Engine.now + 60
+        @counts[t] = 0
+      end
+      es.each do |time,record|
+        c = (@counts[t] = @counts.fetch(t, 0) + 1)
+        if c < @minimum_rate_per_min or c % @interval == 0
+          pairs.push [time, record]
+        end
+      end
+    else
+      es.each do |time,record|
+        c = (@counts[t] = @counts.fetch(t, 0) + 1)
+        if c % @interval == 0
+          pairs.push [time, record]
+          # reset only just before @counts[t] is to be bignum from fixnum
+          @counts[t] = 0 if c > 0x6fffffff
+        end
+      end
+    end
+
     emit_sampled(tag, pairs)
 
     chain.next

@@ -41,12 +41,6 @@ class SamplingFilterOutputTest < Test::Unit::TestCase
     assert_equal 'output', d.instance.add_prefix
   end
 
-  # CONFIG = %[
-  #   interval 10
-  #   sample_unit tag
-  #   remove_prefix input
-  #   add_prefix sampled
-  # ]
   def test_emit
     d1 = create_driver(CONFIG, 'input.hoge1')
     time = Time.parse("2012-01-02 13:14:15").to_i
@@ -96,5 +90,58 @@ class SamplingFilterOutputTest < Test::Unit::TestCase
     assert_equal 'record6', emits[1][2]['field1']
     assert_equal 'record9', emits[2][2]['field1']
     assert_equal 'record12', emits[3][2]['field1']
+  end
+
+  def test_minimum_rate
+    config = %[
+interval 10
+sample_unit tag
+remove_prefix input
+minimum_rate_per_min 100
+]
+    d = create_driver(config, 'input.hoge3')
+    time = Time.parse("2012-01-02 13:14:15").to_i
+    d.run do
+      (1..100).each do |t|
+        d.emit({'times' => t, 'data' => 'x'})
+      end
+      (101..130).each do |t|
+        d.emit({'times' => t, 'data' => 'y'})
+      end
+    end
+    emits = d.emits
+    assert_equal 103, emits.length
+    assert_equal 'sampled.hoge3', emits[0][0]
+    assert_equal ((1..100).map(&:to_i) + [110, 120, 130]), emits.map{|t,time,r| r['times']}
+    assert_equal (['x']*100 + ['y']*3), emits.map{|t,time,r| r['data']}
+
+  end
+  def test_minimum_rate_expire
+    # hey, this test needs 60 seconds....
+    assert_equal 1, 1
+    return
+
+    config = %[
+interval 10
+sample_unit tag
+remove_prefix input
+minimum_rate_per_min 10
+]
+    d = create_driver(config, 'input.hoge4')
+    time = Time.parse("2012-01-02 13:14:15").to_i
+    d.run do
+      (1..100).each do |t|
+        d.emit({'times' => t, 'data' => 'x'})
+      end
+      sleep 60
+      (101..130).each do |t|
+        d.emit({'times' => t, 'data' => 'y'})
+      end
+    end
+    emits = d.emits
+    # assert_equal (19 + 12), emits.length
+    assert_equal 'sampled.hoge4', emits[0][0]
+    assert_equal ((1..10).map(&:to_i)+[20,30,40,50,60,70,80,90,100]+(101..110).map(&:to_i)+[120,130]), emits.map{|t,time,r| r['times']}
+    assert_equal (['x']*19 + ['y']*12), emits.map{|t,time,r| r['data']}
   end
 end
