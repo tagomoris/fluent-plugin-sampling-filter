@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "fluent-plugin-sampling-filter"
-  s.version = "0.1.1"
+  s.version = "0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["TAGOMORI Satoshi"]
-  s.date = "2012-03-29"
+  s.date = "2012-08-08"
   s.description = "fluentd plugin to pickup sample data from matched massages"
   s.email = "tagomoris@gmail.com"
   s.extra_rdoc_files = [
@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
   ]
   s.homepage = "http://github.com/tagomoris/fluent-plugin-sampling-filter"
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.19"
+  s.rubygems_version = "1.8.21"
   s.summary = "fluentd plugin to pickup sample data from matched massages"
 
   if s.respond_to? :specification_version then
