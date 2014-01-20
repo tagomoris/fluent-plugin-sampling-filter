@@ -13,8 +13,10 @@ class Fluent::SamplingFilterOutput < Fluent::Output
     if @remove_prefix
       @removed_prefix_string = @remove_prefix + '.'
       @removed_length = @removed_prefix_string.length
+    elsif @add_prefix.empty?
+      raise Fluent::ConfigError, "either of 'add_prefix' or 'remove_prefix' must be specified"
     end
-    @added_prefix_string = @add_prefix + '.'
+    @added_prefix_string = @add_prefix + '.' unless @add_prefix.empty?
 
     @sample_unit = case @sample_unit
                    when 'tag'
@@ -33,11 +35,11 @@ class Fluent::SamplingFilterOutput < Fluent::Output
         ( (tag.start_with?(@removed_prefix_string) and tag.length > @removed_length) or tag == @remove_prefix)
       tag = tag[@removed_length..-1]
     end
-    tag = if tag.length > 0
-            @added_prefix_string + tag
-          else
-            @add_prefix
-          end
+    if tag.length > 0
+      tag = @added_prefix_string + tag if @added_prefix_string
+    else
+      tag = @add_prefix
+    end
 
     time_record_pairs.each {|t,r|
       Fluent::Engine.emit(tag, t, r)
