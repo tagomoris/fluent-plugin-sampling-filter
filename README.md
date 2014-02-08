@@ -1,4 +1,4 @@
-# fluent-plugin-sampling-filter
+# fluent-plugin-sampling-filter, a plugin for [Fluentd](http://fluentd.org)
 
 ## Component
 
