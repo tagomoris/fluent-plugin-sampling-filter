@@ -4,7 +4,7 @@
 
 ### SamplingFilterOutput
 
-Do sampling from matching messages to analyse and report messages behavior, and emit sampled messages with modified tag.
+This is a [Fluentd](http://fluentd.org) plugin to sample matching messages to analyse and report messages behavior and emit sampled messages with modified tag.
 
 * sampling rate per tags, or for all
 * remove_prefix of tags for input messages, and add_prefix of tags for output(sampled) messages
