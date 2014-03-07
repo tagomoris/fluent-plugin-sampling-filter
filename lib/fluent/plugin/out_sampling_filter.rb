@@ -7,6 +7,11 @@ class Fluent::SamplingFilterOutput < Fluent::Output
   config_param :add_prefix, :string, :default => 'sampled'
   config_param :minimum_rate_per_min, :integer, :default => nil
 
+  # Define `log` method for v0.10.42 or earlier
+  unless method_defined?(:log)
+    define_method("log") { $log }
+  end
+
   def configure(conf)
     super
 
