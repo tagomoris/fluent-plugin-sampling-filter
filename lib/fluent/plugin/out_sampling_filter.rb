@@ -47,7 +47,7 @@ class Fluent::SamplingFilterOutput < Fluent::Output
     end
 
     time_record_pairs.each {|t,r|
-      Fluent::Engine.emit(tag, t, r)
+      router.emit(tag, t, r)
     }
   end
 
