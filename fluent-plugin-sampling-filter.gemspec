@@ -8,7 +8,7 @@ Gem::Specification.new do |gem|
   gem.description   = %q{fluentd plugin to pickup sample data from matched massages}
   gem.summary       = %q{fluentd plugin to pickup sample data from matched massages}
   gem.homepage      = "https://github.com/tagomoris/fluent-plugin-sampling-filter"
-  gem.license       = "APLv2"
+  gem.license       = "Apache-2.0"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
