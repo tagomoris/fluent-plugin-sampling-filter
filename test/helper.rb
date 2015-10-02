@@ -13,6 +13,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'fluent/test'
 require 'fluent/plugin/out_sampling_filter'
+require 'fluent/plugin/filter_sampling'
 
 class Test::Unit::TestCase
 end
