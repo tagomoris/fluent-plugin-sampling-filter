@@ -123,8 +123,7 @@ minimum_rate_per_min 10
       (1..100).each do |t|
         d.filter({'times' => t, 'data' => 'x'})
       end
-      sleep 10
-      # sleep 60
+      sleep 60
       (101..130).each do |t|
         d.filter({'times' => t, 'data' => 'y'})
       end
