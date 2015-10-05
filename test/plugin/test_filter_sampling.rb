@@ -135,20 +135,4 @@ minimum_rate_per_min 10
     assert_equal ((1..10).map(&:to_i)+[20,30,40,50,60,70,80,90,100]+(101..110).map(&:to_i)+[120,130]), filtered.map{|t,time,r| r['times']}
     assert_equal (['x']*19 + ['y']*12), filtered.map{|t,time,r| r['data']}
   end
-
-  def test_filter_without_add_prefix_but_remove_prefix
-    config = %[
-interval 10
-]
-    d = create_driver(config, 'input.hoge3')
-    time = Time.parse("2012-01-02 13:14:15").to_i
-    d.run do
-      (1..100).each do |t|
-        d.filter({'times' => t, 'data' => 'x'})
-      end
-    end
-    filtered = d.filtered_as_array
-    assert_equal 10, filtered.length
-    assert_equal 'input.hoge3', filtered[0][0]
-  end
 end
