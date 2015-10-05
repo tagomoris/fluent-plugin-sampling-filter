@@ -21,14 +21,13 @@ class Fluent::SamplingFilter < Fluent::Filter
   end
 
   def filter_stream(tag, es)
-    new_es = Fluent::MultiEventStream.new
     t = if @sample_unit == :all
           'all'
         else
           tag
         end
 
-    pairs = []
+    new_es = Fluent::MultiEventStream.new
 
     # Access to @counts SHOULD be protected by mutex, with a heavy penalty.
     # Code below is not thread safe, but @counts (counter for sampling rate) is not
