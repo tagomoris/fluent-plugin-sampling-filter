@@ -105,12 +105,11 @@ minimum_rate_per_min 100
     assert_equal 'input.hoge3', filtered[0][0]
     assert_equal ((1..100).map(&:to_i) + [110, 120, 130]), filtered.map{|t,time,r| r['times']}
     assert_equal (['x']*100 + ['y']*3), filtered.map{|t,time,r| r['data']}
-
   end
+
   def test_filter_minimum_rate_expire
     # hey, this test needs 60 seconds....
-    assert_equal 1, 1
-    return
+    omit("this test needs 60 seconds....") unless ENV["EXECLONGTEST"]
 
     config = %[
 interval 10

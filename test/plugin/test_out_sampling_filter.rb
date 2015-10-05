@@ -118,8 +118,7 @@ minimum_rate_per_min 100
   end
   def test_minimum_rate_expire
     # hey, this test needs 60 seconds....
-    assert_equal 1, 1
-    return
+    omit("this test needs 60 seconds....") unless ENV["EXECLONGTEST"]
 
     config = %[
 interval 10
