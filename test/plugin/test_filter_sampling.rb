@@ -108,9 +108,6 @@ minimum_rate_per_min 100
   end
 
   def test_filter_minimum_rate_expire
-    # hey, this test needs 60 seconds....
-    omit("this test needs 60 seconds....") unless ENV["EXECLONGTEST"]
-
     config = %[
 interval 10
 sample_unit tag
@@ -119,18 +116,14 @@ minimum_rate_per_min 10
     d = create_driver(config, 'input.hoge4')
     time = Time.parse("2012-01-02 13:14:15").to_i
     d.run do
-      (1..100).each do |t|
+      (1..30).each do |t|
         d.filter({'times' => t, 'data' => 'x'})
-      end
-      sleep 60
-      (101..130).each do |t|
-        d.filter({'times' => t, 'data' => 'y'})
       end
     end
     filtered = d.filtered_as_array
-    # assert_equal (19 + 12), filtered.length
+    assert_equal 12, filtered.length
     assert_equal 'input.hoge4', filtered[0][0]
-    assert_equal ((1..10).map(&:to_i)+[20,30,40,50,60,70,80,90,100]+(101..110).map(&:to_i)+[120,130]), filtered.map{|t,time,r| r['times']}
-    assert_equal (['x']*19 + ['y']*12), filtered.map{|t,time,r| r['data']}
+    assert_equal ((1..10).map(&:to_i)+[20,30]), filtered.map{|t,time,r| r['times']}
+    assert_equal (['x']*12), filtered.map{|t,time,r| r['data']}
   end
 end
