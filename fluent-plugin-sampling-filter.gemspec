@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-sampling-filter"
-  gem.version       = "0.1.3"
+  gem.version       = "0.2.0"
   gem.authors       = ["TAGOMORI Satoshi"]
   gem.email         = ["tagomoris@gmail.com"]
   gem.description   = %q{fluentd plugin to pickup sample data from matched massages}
