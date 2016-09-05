@@ -16,7 +16,7 @@ This is a [Fluentd](http://fluentd.org) plugin to sample matching messages to an
 Pickup 1/10 messages about each tags(default: `sample_unit tag`), and add tag prefix `sampled`.
 
     <match **>
-      type sampling_filter
+      @type sampling_filter
       interval 10
       add_prefix sampled
     </match>
@@ -28,7 +28,7 @@ Pickup 1/10 messages about each tags(default: `sample_unit tag`), and add tag pr
 Pickup 1/100 messages of all matched messages, and modify tags from `input.**` to `output.**`
 
     <match input.**>
-      type sampling_filter
+      @type sampling_filter
       interval 100
       sample_unit all
       remove_prefix input
