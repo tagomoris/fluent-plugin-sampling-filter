@@ -17,7 +17,7 @@ class SamplingFilterTest < Test::Unit::TestCase
 
   def test_configure
     assert_raise(Fluent::ConfigError) {
-      d = create_driver('')
+      create_driver('')
     }
     d = create_driver %[
       interval 5
@@ -93,16 +93,16 @@ minimum_rate_per_min 100
     time = Time.parse("2012-01-02 13:14:15").to_i
     d.run(default_tag: 'input.hoge3') do
       (1..100).each do |t|
-        d.feed({'times' => t, 'data' => 'x'})
+        d.feed(time, {'times' => t, 'data' => 'x'})
       end
       (101..130).each do |t|
-        d.feed({'times' => t, 'data' => 'y'})
+        d.feed(time, {'times' => t, 'data' => 'y'})
       end
     end
     filtered = d.filtered
     assert_equal 103, filtered.length
-    assert_equal ((1..100).map(&:to_i) + [110, 120, 130]), filtered.map{|time,r| r['times']}
-    assert_equal (['x']*100 + ['y']*3), filtered.map{|time,r| r['data']}
+    assert_equal ((1..100).map(&:to_i) + [110, 120, 130]), filtered.map{|_time,r| r['times']}
+    assert_equal (['x']*100 + ['y']*3), filtered.map{|_time,r| r['data']}
   end
 
   def test_filter_minimum_rate_expire
@@ -115,12 +115,12 @@ minimum_rate_per_min 10
     time = Time.parse("2012-01-02 13:14:15").to_i
     d.run(default_tag: 'input.hoge4') do
       (1..30).each do |t|
-        d.feed({'times' => t, 'data' => 'x'})
+        d.feed(time, {'times' => t, 'data' => 'x'})
       end
     end
     filtered = d.filtered
     assert_equal 12, filtered.length
-    assert_equal ((1..10).map(&:to_i)+[20,30]), filtered.map{|time,r| r['times']}
-    assert_equal (['x']*12), filtered.map{|time,r| r['data']}
+    assert_equal ((1..10).map(&:to_i)+[20,30]), filtered.map{|_time,r| r['times']}
+    assert_equal (['x']*12), filtered.map{|_time,r| r['data']}
   end
 end

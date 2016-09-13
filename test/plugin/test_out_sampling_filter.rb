@@ -19,7 +19,7 @@ class SamplingFilterOutputTest < Test::Unit::TestCase
 
   def test_configure
     assert_raise(Fluent::ConfigError) {
-      d = create_driver('')
+      create_driver('')
     }
     d = create_driver %[
       interval 5
@@ -104,17 +104,17 @@ minimum_rate_per_min 100
     time = Time.parse("2012-01-02 13:14:15").to_i
     d.run(default_tag: 'input.hoge3') do
       (1..100).each do |t|
-        d.feed({'times' => t, 'data' => 'x'})
+        d.feed(time, {'times' => t, 'data' => 'x'})
       end
       (101..130).each do |t|
-        d.feed({'times' => t, 'data' => 'y'})
+        d.feed(time, {'times' => t, 'data' => 'y'})
       end
     end
     events = d.events
     assert_equal 103, events.length
     assert_equal 'sampled.hoge3', events[0][0]
-    assert_equal ((1..100).map(&:to_i) + [110, 120, 130]), events.map{|t,time,r| r['times']}
-    assert_equal (['x']*100 + ['y']*3), events.map{|t,time,r| r['data']}
+    assert_equal ((1..100).map(&:to_i) + [110, 120, 130]), events.map{|_tag,_time,r| r['times']}
+    assert_equal (['x']*100 + ['y']*3), events.map{|_tag,_time,r| r['data']}
 
   end
   def test_minimum_rate_expire
@@ -141,8 +141,8 @@ minimum_rate_per_min 10
     events = d.events
     # assert_equal (19 + 12), events.length
     assert_equal 'sampled.hoge4', events[0][0]
-    assert_equal ((1..10).map(&:to_i)+[20,30,40,50,60,70,80,90,100]+(101..110).map(&:to_i)+[120,130]), events.map{|t,time,r| r['times']}
-    assert_equal (['x']*19 + ['y']*12), events.map{|t,time,r| r['data']}
+    assert_equal ((1..10).map(&:to_i)+[20,30,40,50,60,70,80,90,100]+(101..110).map(&:to_i)+[120,130]), events.map{|_tag,_time,r| r['times']}
+    assert_equal (['x']*19 + ['y']*12), events.map{|_tag,_time,r| r['data']}
   end
 
   def test_without_add_prefix_but_remove_prefix
@@ -155,7 +155,7 @@ remove_prefix input
     time = Time.parse("2012-01-02 13:14:15").to_i
     d.run(default_tag: 'input.hoge3') do
       (1..100).each do |t|
-        d.feed({'times' => t, 'data' => 'x'})
+        d.feed(time, {'times' => t, 'data' => 'x'})
       end
     end
     events = d.events
