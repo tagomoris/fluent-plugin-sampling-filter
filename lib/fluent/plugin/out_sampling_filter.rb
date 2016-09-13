@@ -20,6 +20,7 @@ class Fluent::Plugin::SamplingFilterOutput < Fluent::Plugin::Output
     elsif @add_prefix.empty?
       raise Fluent::ConfigError, "either of 'add_prefix' or 'remove_prefix' must be specified"
     end
+    @added_prefix_string = nil
     @added_prefix_string = @add_prefix + '.' unless @add_prefix.empty?
 
     @sample_unit = case @sample_unit
