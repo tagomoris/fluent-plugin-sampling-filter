@@ -1,5 +1,9 @@
-class Fluent::SamplingFilterOutput < Fluent::Output
+require 'fluent/plugin/output'
+
+class Fluent::Plugin::SamplingFilterOutput < Fluent::Plugin::Output
   Fluent::Plugin.register_output('sampling_filter', self)
+
+  helpers :event_emitter
 
   config_param :interval, :integer
   config_param :sample_unit, :string, :default => 'tag'
@@ -51,7 +55,7 @@ class Fluent::SamplingFilterOutput < Fluent::Output
     }
   end
 
-  def emit(tag, es, chain)
+  def process(tag, es)
     t = if @sample_unit == :all
           'all'
         else
@@ -90,7 +94,5 @@ class Fluent::SamplingFilterOutput < Fluent::Output
     end
 
     emit_sampled(tag, pairs)
-
-    chain.next
   end
 end
