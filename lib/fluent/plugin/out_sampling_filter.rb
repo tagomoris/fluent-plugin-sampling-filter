@@ -1,4 +1,5 @@
 require 'fluent/plugin/output'
+require 'fluent/clock'
 
 class Fluent::Plugin::SamplingFilterOutput < Fluent::Plugin::Output
   Fluent::Plugin.register_output('sampling_filter', self)
@@ -6,13 +7,15 @@ class Fluent::Plugin::SamplingFilterOutput < Fluent::Plugin::Output
   helpers :event_emitter
 
   config_param :interval, :integer
-  config_param :sample_unit, :string, :default => 'tag'
-  config_param :remove_prefix, :string, :default => nil
-  config_param :add_prefix, :string, :default => 'sampled'
-  config_param :minimum_rate_per_min, :integer, :default => nil
+  config_param :sample_unit, :enum, list: [:tag, :all], default: :tag
+  config_param :remove_prefix, :string, default: nil
+  config_param :add_prefix, :string, default: 'sampled'
+  config_param :minimum_rate_per_min, :integer, default: nil
 
   def configure(conf)
     super
+
+    log.warn "sampling_filter output plugin is deprecated. use sampling_filter filter plugin instead with <label> routing."
 
     if @remove_prefix
       @removed_prefix_string = @remove_prefix + '.'
@@ -23,14 +26,6 @@ class Fluent::Plugin::SamplingFilterOutput < Fluent::Plugin::Output
     @added_prefix_string = nil
     @added_prefix_string = @add_prefix + '.' unless @add_prefix.empty?
 
-    @sample_unit = case @sample_unit
-                   when 'tag'
-                     :tag
-                   when 'all'
-                     :all
-                   else
-                     raise Fluent::ConfigError, "sample_unit allows only 'tag' or 'all'"
-                   end
     @counts = {}
     @resets = {} if @minimum_rate_per_min
   end
@@ -65,11 +60,9 @@ class Fluent::Plugin::SamplingFilterOutput < Fluent::Plugin::Output
     # so serious value (and probably will not be broken...),
     # then i let here as it is now.
     if @minimum_rate_per_min
-      unless @resets[t]
-        @resets[t] = Fluent::Engine.now + (60 - rand(30))
-      end
-      if Fluent::Engine.now > @resets[t]
-        @resets[t] = Fluent::Engine.now + 60
+      @resets[t] ||= Fluent::Clock.now + (60 - rand(30))
+      if Fluent::Clock.now > @resets[t]
+        @resets[t] = Fluent::Clock.now + 60
         @counts[t] = 0
       end
       es.each do |time,record|
