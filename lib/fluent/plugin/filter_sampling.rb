@@ -1,4 +1,6 @@
-class Fluent::SamplingFilter < Fluent::Filter
+require 'fluent/plugin/filter'
+
+class Fluent::Plugin::SamplingFilter < Fluent::Plugin::Filter
   Fluent::Plugin.register_filter('sampling_filter', self)
 
   config_param :interval, :integer

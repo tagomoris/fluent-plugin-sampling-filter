@@ -1,16 +1,15 @@
-class Fluent::SamplingFilterOutput < Fluent::Output
+require 'fluent/plugin/output'
+
+class Fluent::Plugin::SamplingFilterOutput < Fluent::Plugin::Output
   Fluent::Plugin.register_output('sampling_filter', self)
+
+  helpers :event_emitter
 
   config_param :interval, :integer
   config_param :sample_unit, :string, :default => 'tag'
   config_param :remove_prefix, :string, :default => nil
   config_param :add_prefix, :string, :default => 'sampled'
   config_param :minimum_rate_per_min, :integer, :default => nil
-
-  # Define `log` method for v0.10.42 or earlier
-  unless method_defined?(:log)
-    define_method("log") { $log }
-  end
 
   def configure(conf)
     super
@@ -21,6 +20,7 @@ class Fluent::SamplingFilterOutput < Fluent::Output
     elsif @add_prefix.empty?
       raise Fluent::ConfigError, "either of 'add_prefix' or 'remove_prefix' must be specified"
     end
+    @added_prefix_string = nil
     @added_prefix_string = @add_prefix + '.' unless @add_prefix.empty?
 
     @sample_unit = case @sample_unit
@@ -51,7 +51,7 @@ class Fluent::SamplingFilterOutput < Fluent::Output
     }
   end
 
-  def emit(tag, es, chain)
+  def process(tag, es)
     t = if @sample_unit == :all
           'all'
         else
@@ -90,7 +90,5 @@ class Fluent::SamplingFilterOutput < Fluent::Output
     end
 
     emit_sampled(tag, pairs)
-
-    chain.next
   end
 end
