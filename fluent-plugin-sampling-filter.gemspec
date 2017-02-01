@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-sampling-filter"
-  gem.version       = "0.2.0"
+  gem.version       = "0.2.1"
   gem.authors       = ["TAGOMORI Satoshi"]
   gem.email         = ["tagomoris@gmail.com"]
   gem.description   = %q{fluentd plugin to pickup sample data from matched massages}
@@ -17,5 +17,5 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency "rake"
   gem.add_runtime_dependency "test-unit", "~> 3.1.0"
-  gem.add_runtime_dependency "fluentd", [">= 0.12.0", "< 2"]
+  gem.add_runtime_dependency "fluentd", [">= 0.12.0", "< 0.14.0"]
 end
