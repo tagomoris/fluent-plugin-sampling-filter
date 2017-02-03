@@ -4,6 +4,13 @@ This is a [Fluentd](http://fluentd.org) plugin to sample matching messages to an
 
 * sampling rate per tags, or for all
 
+## Requirements
+
+| fluent-plugin-sampling-filter | fluentd    | ruby   |
+|-------------------------------|------------|--------|
+| >= 1.0.0                      | >= v0.14.0 | >= 2.1 |
+| <  1.0.0                      | <  v0.14.0 | >= 1.9 |
+
 ## Configuration
 
 ### SamplingFilter
