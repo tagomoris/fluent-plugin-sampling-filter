@@ -6,14 +6,17 @@ class Fluent::Plugin::SamplingFilter < Fluent::Plugin::Filter
   Fluent::Plugin.register_filter('sampling_filter', self)
 
   config_param :interval, :integer
-  config_param :sample_unit, :enum, list: [:tag, :all], default: :tag
+  config_param :sample_unit, :string, default: 'tag'
   config_param :minimum_rate_per_min, :integer, default: nil
+
+  helpers :record_accessor
 
   def configure(conf)
     super
 
     @counts = {}
     @resets = {} if @minimum_rate_per_min
+    @accessor = record_accessor_create(@sample_unit) unless %w(all tag).include?(@sample_unit)
   end
 
   # Access to @counts SHOULD be protected by mutex, with a heavy penalty.
@@ -22,7 +25,7 @@ class Fluent::Plugin::SamplingFilter < Fluent::Plugin::Filter
   # then i let here as it is now.
 
   def filter(tag, _time, record)
-    t = @sample_unit == :all ? 'all' : tag
+    t = record_key(tag, record)
     if @minimum_rate_per_min
       filter_with_minimum_rate(t, record)
     else
@@ -52,6 +55,17 @@ class Fluent::Plugin::SamplingFilter < Fluent::Plugin::Filter
       record.dup
     else
       nil
+    end
+  end
+
+  def record_key(tag, record)
+    case @sample_unit
+    when :all
+      'all'
+    when 'tag'
+      tag
+    else
+      @accessor.call(record)
     end
   end
 end

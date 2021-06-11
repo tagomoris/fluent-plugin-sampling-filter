@@ -24,14 +24,21 @@ class SamplingFilterTest < Test::Unit::TestCase
     ]
 
     assert_equal 5, d.instance.interval
-    assert_equal :tag, d.instance.sample_unit
+    assert_equal 'tag', d.instance.sample_unit
 
     d = create_driver %[
       interval 1000
       sample_unit all
     ]
     assert_equal 1000, d.instance.interval
-    assert_equal :all, d.instance.sample_unit
+    assert_equal 'all', d.instance.sample_unit
+
+    d = create_driver %[
+      interval 1000
+      sample_unit $fake
+    ]
+    assert_equal 1000, d.instance.interval
+    assert_equal "$fake", d.instance.sample_unit
   end
 
   def test_filter
@@ -122,5 +129,39 @@ minimum_rate_per_min 10
     assert_equal 12, filtered.length
     assert_equal ((1..10).map(&:to_i)+[20,30]), filtered.map{|_time,r| r['times']}
     assert_equal (['x']*12), filtered.map{|_time,r| r['data']}
+  end
+
+  def test_filer_with_record_accessor
+    d2 = create_driver(%[
+      interval 3
+      sample_unit field3
+    ])
+    time = Time.parse("2012-01-02 13:14:15").to_i
+    d2.run(default_tag: 'input.hoge2') do
+      (1..12).each do |i|
+        [1,2].each do |sample_vaule|
+          d2.feed({'field1' => "record#{i}", 'field2' => i, 'field3' => sample_vaule})
+        end
+      end
+    end
+    filtered = d2.filtered
+    assert_equal 8, filtered.length
+
+    assert_equal 'record3', filtered[0][1]['field1']
+    assert_equal 1, filtered[0][1]['field3']
+    assert_equal 'record3', filtered[1][1]['field1']
+    assert_equal 2, filtered[1][1]['field3']
+    assert_equal 'record6', filtered[2][1]['field1']
+    assert_equal 1, filtered[2][1]['field3']
+    assert_equal 'record6', filtered[3][1]['field1']
+    assert_equal 2, filtered[3][1]['field3']
+    assert_equal 'record9', filtered[4][1]['field1']
+    assert_equal 1, filtered[4][1]['field3']
+    assert_equal 'record9', filtered[5][1]['field1']
+    assert_equal 2, filtered[5][1]['field3']
+    assert_equal 'record12', filtered[6][1]['field1']
+    assert_equal 1, filtered[6][1]['field3']
+    assert_equal 'record12', filtered[7][1]['field1']
+    assert_equal 2, filtered[7][1]['field3']
   end
 end
