@@ -60,7 +60,7 @@ class Fluent::Plugin::SamplingFilter < Fluent::Plugin::Filter
 
   def record_key(tag, record)
     case @sample_unit
-    when :all
+    when 'all'
       'all'
     when 'tag'
       tag

@@ -164,4 +164,23 @@ minimum_rate_per_min 10
     assert_equal 'record12', filtered[7][1]['field1']
     assert_equal 2, filtered[7][1]['field3']
   end
+
+  def test_filter_all
+    config = %[
+      interval 10
+      sample_unit all
+    ]
+    d1 = create_driver(config)
+    time = Time.parse("2012-01-02 13:14:15").to_i
+    d1.run do
+      6.times do |i|
+        [0,1].each do |j|
+          d1.feed("input.hoge#{2*i+j}", time, {'field1' => "record#{2*i+j+1}"})
+        end
+      end
+    end
+    filtered = d1.filtered
+    assert_equal 1, filtered.length
+    assert_equal 'record10', filtered[0][1]['field1']
+  end
 end
