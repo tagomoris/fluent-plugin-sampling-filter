@@ -25,6 +25,7 @@ This filter passes a specified part of whole events to following filter/output p
     <label @mydata>
       <filter **>
         @type sampling
+        sample_unit all
         interval 10    # pass 1/10 events to following plugins
       </filter>
 
@@ -52,7 +53,31 @@ Sampling is done for all events, but we can do it per matched tags:
       </match>
     </label>
 
+
+We can also sample based on a value in the message
+
+    <source>
+      @type any_great_input
+      @label @mydata
+    </source>
+
+    <label @mydata>
+      <filter **>
+        @type sampling
+        interval 10
+        # pass 1/10 events per user given events like: { user: { name: "Bob" }, ... }
+        sample_unit $.user.name
+      </filter>
+
+      <match **>
+        @type ...
+      </match>
+    </label>
+
 `minimum_rate_per_min` option(integer) configures this plugin to pass events with the specified rate even how small is the total number of whole events.
+
+`sample_unit` option(string) configures this plugin to sample data based on tag(default), 'all', or by field value
+using the [record accessor syntax](https://docs.fluentd.org/plugin-helper-overview/api-plugin-helper-record_accessor).
 
 ### SamplingFilterOutput
 
